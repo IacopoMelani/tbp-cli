@@ -12,6 +12,7 @@ type UnlockKeystoreViewModel struct {
 	ViewModel
 	keystorePath string
 	password     string
+	form         *tview.Form
 }
 
 func NewUnlockKeystoreViewModel(app *tview.Application) *UnlockKeystoreViewModel {
@@ -21,15 +22,11 @@ func NewUnlockKeystoreViewModel(app *tview.Application) *UnlockKeystoreViewModel
 	return vm
 }
 
-func (vm *UnlockKeystoreViewModel) form() *tview.Form {
-	return vm.View.(*tview.Form)
-}
-
 func (vm *UnlockKeystoreViewModel) Reset() {
 	vm.keystorePath = ""
 	vm.password = ""
-	vm.form().GetFormItem(0).(*tview.InputField).SetText("")
-	vm.form().GetFormItem(1).(*tview.InputField).SetText("")
+	vm.form.GetFormItem(0).(*tview.InputField).SetText("")
+	vm.form.GetFormItem(1).(*tview.InputField).SetText("")
 }
 
 func (vm *UnlockKeystoreViewModel) UnlockKeystoreView() tview.Primitive {
@@ -61,7 +58,9 @@ func (vm *UnlockKeystoreViewModel) UnlockKeystoreView() tview.Primitive {
 			}
 
 			vm.done(key)
-
+		}).
+		AddButton("Clear", func() {
+			vm.Reset()
 		}).
 		AddButton("Quit", func() {
 			vm.app.Stop()
@@ -69,5 +68,13 @@ func (vm *UnlockKeystoreViewModel) UnlockKeystoreView() tview.Primitive {
 
 	form.SetBorder(true).SetTitle(" First unlock your keystore ").SetTitleAlign(tview.AlignCenter)
 
-	return form
+	flexForm := tview.NewFlex().
+		AddItem(nil, 0, 1, false).
+		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+			AddItem(nil, 0, 1, false).
+			AddItem(form, 0, 1, true).
+			AddItem(nil, 0, 1, false), 100, 1, true).
+		AddItem(nil, 0, 1, false)
+
+	return flexForm
 }

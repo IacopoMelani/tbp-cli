@@ -9,11 +9,10 @@ import (
 const (
 	pageUnlockKeystore = "unlockKeystore"
 	pageError          = "error"
+	pageHome           = "home"
 )
 
 func main() {
-
-	var key *keystore.Key
 
 	app := tview.NewApplication()
 
@@ -22,8 +21,11 @@ func main() {
 	unlockKeystoreViewModel := views.NewUnlockKeystoreViewModel(app)
 
 	unlockKeystoreViewModel.SetDoneFunc(func(data interface{}) {
-		key = data.(*keystore.Key)
-		app.Stop()
+
+		key := data.(*keystore.Key)
+		homeViewModel := views.NewHomeViewModel(app, key)
+
+		pages.AddAndSwitchToPage(pageHome, homeViewModel.View, true)
 	})
 	unlockKeystoreViewModel.SetErrorFunc(func(err error) {
 
@@ -38,13 +40,11 @@ func main() {
 
 	pages.AddPage(pageUnlockKeystore, unlockKeystoreViewModel.View, true, true)
 
-	_ = key
-
 	showView(app, pages)
 }
 
 func showView(app *tview.Application, view tview.Primitive) {
-	if err := app.SetRoot(view, true).EnableMouse(true).Run(); err != nil {
+	if err := app.SetRoot(view, true).Run(); err != nil {
 		panic(err)
 	}
 }
