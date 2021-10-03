@@ -76,13 +76,14 @@ func (vm *HomeViewModel) HomeView() tview.Primitive {
 	homeView := tview.NewFlex().
 		AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
 			AddItem(tview.NewBox().SetBorder(true).SetTitle(" TX in "), 0, 1, false).
-			AddItem(tview.NewBox().SetBorder(true).SetTitle(" TX out "), 0, 1, false),
-			0, 3, false).
+			AddItem(tview.NewBox().SetBorder(true).SetTitle(" TX out "), 0, 1, false).
+			AddItem(tview.NewBox().SetBorder(true).SetTitle(" TX pending "), 0, 1, false),
+			0, 5, false).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(vm.HomeBalanceView(), 0, 1, false).
 			AddItem(vm.HomeSendView(), 0, 8, true).
 			AddItem(vm.HomeReceiveView(), 0, 1, false),
-			0, 2, true)
+			0, 4, true)
 
 	pages.AddPage("home", homeView, true, true)
 
@@ -143,6 +144,15 @@ func (vm *HomeViewModel) HomeSendView() tview.Primitive {
 			}
 			reviewTxView := NewTxReviewViewModel(vm.app, vm.key, vm.tempToAddress, vm.tempAmount)
 			reviewTxView.SetDoneFunc(func(data interface{}) {
+				if err := api.SendTx(vm.key, vm.tempToAddress, vm.tempAmount); err != nil {
+					errorViewModel := NewErrorViewModel(vm.app, err)
+					vm.pages.AddAndSwitchToPage("error", errorViewModel.View, true)
+
+					errorViewModel.SetDoneFunc(func(data interface{}) {
+						vm.pages.SwitchToPage("home")
+						vm.pages.RemovePage("error")
+					})
+				}
 				vm.resetTempTx()
 				vm.pages.RemovePage("review")
 			})
