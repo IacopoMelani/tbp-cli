@@ -18,10 +18,13 @@ type HomeViewModel struct {
 	outTx   []database.SignedTx
 	key     *keystore.Key
 
+	pages *tview.Pages
+
 	textViewBalance *tview.TextView
 	formSend        *tview.Form
-	tempToAddress   string
-	tempAmount      uint
+
+	tempToAddress string
+	tempAmount    uint
 }
 
 func NewHomeViewModel(app *tview.Application, key *keystore.Key) *HomeViewModel {
@@ -68,6 +71,8 @@ func (vm *HomeViewModel) resetTempTx() {
 
 func (vm *HomeViewModel) HomeView() tview.Primitive {
 
+	pages := tview.NewPages()
+
 	homeView := tview.NewFlex().
 		AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
 			AddItem(tview.NewBox().SetBorder(true).SetTitle(" TX in "), 0, 1, false).
@@ -79,7 +84,11 @@ func (vm *HomeViewModel) HomeView() tview.Primitive {
 			AddItem(vm.HomeReceiveView(), 0, 1, false),
 			0, 2, true)
 
-	return homeView
+	pages.AddPage("home", homeView, true, true)
+
+	vm.pages = pages
+
+	return pages
 }
 
 func (vm *HomeViewModel) HomeBalanceView() tview.Primitive {
@@ -129,7 +138,20 @@ func (vm *HomeViewModel) HomeSendView() tview.Primitive {
 			vm.tempAmount = uint(amount)
 		}).
 		AddButton("Send", func() {
-			vm.resetTempTx()
+			if vm.tempToAddress == "" || vm.tempAmount == 0 {
+				return
+			}
+			reviewTxView := NewTxReviewViewModel(vm.app, vm.key, vm.tempToAddress, vm.tempAmount)
+			reviewTxView.SetDoneFunc(func(data interface{}) {
+				vm.resetTempTx()
+				vm.pages.RemovePage("review")
+			})
+			reviewTxView.SetCancelFunc(func() {
+				vm.resetTempTx()
+				vm.pages.RemovePage("review")
+
+			})
+			vm.pages.AddAndSwitchToPage("review", reviewTxView.View, true)
 		}).
 		AddButton("Cancel", func() {
 			vm.resetTempTx()

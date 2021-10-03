@@ -35,6 +35,7 @@ func main() {
 		errorViewModel.SetDoneFunc(func(data interface{}) {
 			unlockKeystoreViewModel.Reset()
 			pages.SwitchToPage(pageUnlockKeystore)
+			pages.RemovePage(pageError)
 		})
 	})
 

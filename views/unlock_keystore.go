@@ -68,6 +68,8 @@ func (vm *UnlockKeystoreViewModel) UnlockKeystoreView() tview.Primitive {
 
 	form.SetBorder(true).SetTitle(" First unlock your keystore ").SetTitleAlign(tview.AlignCenter)
 
+	vm.form = form
+
 	flexForm := tview.NewFlex().
 		AddItem(nil, 0, 1, false).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
