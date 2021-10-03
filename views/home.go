@@ -173,7 +173,7 @@ func (vm *HomeViewModel) HomeReceiveView() tview.Primitive {
 		SetRegions(true).
 		SetWordWrap(true)
 
-	fmt.Fprintf(textView, "You can receive [yellow]TBP[white] at this address: \n[red]%s", "0x50543e830590fd03a0301faa0164d731f0e2ff7d")
+	fmt.Fprintf(textView, "You can receive [yellow]TBP[white] at this address: \n[red]%s", vm.key.Address.Hex())
 
 	textView.SetTextAlign(tview.AlignCenter)
 
