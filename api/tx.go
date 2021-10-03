@@ -16,6 +16,30 @@ type NextNonceRes struct {
 	Nonce uint `json:"nonce"`
 }
 
+type TxsRes struct {
+	Txs []database.SignedTx `json:"transactions"`
+}
+
+func GetTxs(key *keystore.Key, txType string) ([]database.SignedTx, error) {
+
+	rawBody, err := makeRequest("http://localhost:8110/address/transactions", "POST", map[string]interface{}{
+		"account": key.Address.Hex(),
+		"type":    txType,
+		"last":    10,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var txs TxsRes
+	err = json.Unmarshal(rawBody, &txs)
+	if err != nil {
+		return nil, err
+	}
+
+	return txs.Txs, nil
+}
+
 func SendTx(key *keystore.Key, to string, amount uint) error {
 
 	nextNonceRawBody, err := makeRequest("http://localhost:8110/address/nonce/next", "POST", map[string]interface{}{
