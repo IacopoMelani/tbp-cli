@@ -1,8 +1,12 @@
 package views
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/IacopoMelani/tbp-cli/wallet"
 	"github.com/rivo/tview"
+	"golang.design/x/clipboard"
 )
 
 type GenerateViewModel struct {
@@ -26,22 +30,30 @@ func (vm *GenerateViewModel) GenerateView() tview.Primitive {
 		panic(err)
 	}
 
-	form := tview.NewForm()
-	form.AddInputField("Mnemonic", mnemonic, 0, nil, func(text string) {
-		form.GetFormItem(0).(*tview.InputField).SetText(mnemonic)
-	}).
-		AddButton("Done", func() {
-			vm.Cancel()
-		})
+	mnemonicStr := fmt.Sprintf("%s\n\n", " This is your 24 words, use this to generate a new wallet with 'recover' module, do not share this words with anyone ")
+	for _, str := range strings.Split(mnemonic, " ") {
+		mnemonicStr += fmt.Sprintf("%s\n", str)
+	}
 
-	form.SetTitle(" This is your 24 words, use this to generate a new wallet with 'recover' module, do not share this words with anyone ").SetBorder(true)
+	modal := tview.NewModal()
+	modal.AddButtons([]string{"Copy to clipboard", "Close"})
+	modal.SetTitleAlign(tview.AlignCenter)
+	modal.SetBorder(true)
+	modal.SetText(mnemonicStr)
+	modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+		if buttonIndex == 1 {
+			vm.Cancel()
+		} else if buttonIndex == 0 {
+			clipboard.Write(clipboard.FmtText, []byte(mnemonic))
+		}
+	})
 
 	flex := tview.NewFlex().
 		AddItem(tview.NewBox(), 0, 1, false).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-			AddItem(tview.NewBox(), 0, 3, false).
-			AddItem(form, 0, 1, true).
-			AddItem(tview.NewBox(), 0, 3, false), 0, 5, true).
+			AddItem(tview.NewBox(), 0, 2, false).
+			AddItem(modal, 0, 1, true).
+			AddItem(tview.NewBox(), 0, 2, false), 0, 5, true).
 		AddItem(tview.NewBox(), 0, 1, false)
 
 	return flex

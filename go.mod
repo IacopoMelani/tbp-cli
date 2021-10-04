@@ -27,4 +27,10 @@ require (
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 )
 
-require github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce // indirect
+require (
+	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce // indirect
+	golang.design/x/clipboard v0.5.3 // indirect
+	golang.org/x/exp v0.0.0-20191227195350-da58074b4299 // indirect
+	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d // indirect
+	golang.org/x/mobile v0.0.0-20210716004757-34ab1303b554 // indirect
+)

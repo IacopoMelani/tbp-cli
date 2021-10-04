@@ -31,7 +31,7 @@ func (vm *RecoverViewModel) RecoverView() tview.Primitive {
 	form.AddInputField("Mnemonic", "", 0, nil, func(text string) {
 		vm.mnemonic = text
 	})
-	form.AddInputField("Provide a password", "", 0, nil, func(text string) {
+	form.AddPasswordField("Provide a password", "", 0, '*', func(text string) {
 		vm.pwd = text
 	})
 	form.AddButton("Recover", func() {
@@ -49,7 +49,7 @@ func (vm *RecoverViewModel) RecoverView() tview.Primitive {
 		AddItem(tview.NewBox(), 0, 1, false).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(tview.NewBox(), 0, 3, false).
-			AddItem(form, 0, 1, true).
+			AddItem(form, 0, 3, true).
 			AddItem(tview.NewBox(), 0, 3, false), 0, 3, true).
 		AddItem(tview.NewBox(), 0, 1, false)
 
