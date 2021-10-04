@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/IacopoMelani/tbp-cli/api"
-	"github.com/IacopoMelani/the-blockchain-pub/database"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/rivo/tview"
 )
@@ -16,9 +15,9 @@ type HomeViewModel struct {
 
 	key        *keystore.Key
 	balance    uint
-	inTxs      []database.SignedTx
-	outTxs     []database.SignedTx
-	pendingTxs []database.SignedTx
+	inTxs      []api.TX
+	outTxs     []api.TX
+	pendingTxs []api.TX
 
 	pages *tview.Pages
 
@@ -39,9 +38,9 @@ func NewHomeViewModel(app *tview.Application, key *keystore.Key) *HomeViewModel 
 	vm.app = app
 
 	vm.key = key
-	vm.inTxs = make([]database.SignedTx, 0)
-	vm.outTxs = make([]database.SignedTx, 0)
-	vm.pendingTxs = make([]database.SignedTx, 0)
+	vm.inTxs = make([]api.TX, 0)
+	vm.outTxs = make([]api.TX, 0)
+	vm.pendingTxs = make([]api.TX, 0)
 
 	go vm.fetch()
 
@@ -128,7 +127,7 @@ func (vm *HomeViewModel) HomeView() tview.Primitive {
 	return pages
 }
 
-func (vm *HomeViewModel) HomeTxsView(title string, txs []database.SignedTx, registerFunc func(textView *tview.TextView)) tview.Primitive {
+func (vm *HomeViewModel) HomeTxsView(title string, txs []api.TX, registerFunc func(textView *tview.TextView)) tview.Primitive {
 
 	textView := tview.NewTextView().
 		SetDynamicColors(true).
@@ -236,9 +235,9 @@ func setBalaceTextViewBalance(textView *tview.TextView, balance uint) {
 	fmt.Fprintf(textView, "Your current balance is: %d [yellow]TBP", balance)
 }
 
-func setListTxsTextView(textView *tview.TextView, txs []database.SignedTx) {
+func setListTxsTextView(textView *tview.TextView, txs []api.TX) {
 	textView.Clear()
 	for _, tx := range txs {
-		fmt.Fprintf(textView, "🔴From: [yellow]%v[white]\n🟡To: [yellow]%v[white]\n🟢Amount: [red]%v[yellow] TBP\n\n\n", tx.Tx.From, tx.Tx.To, tx.Tx.Value)
+		fmt.Fprintf(textView, "⚪Block: [yellow]%v[white]\n⚫Hash: [yellow]%v[white]\n🔴From: [yellow]%v[white]\n🟠To: [yellow]%v[white]\n🟡Nonce: [yellow]%v[white]\n🟢Amount: [red]%v[yellow] TBP\n\n\n", tx.BlockHash, tx.TxHash, tx.Tx.From, tx.Tx.To, tx.Nonce, tx.Tx.Value)
 	}
 }

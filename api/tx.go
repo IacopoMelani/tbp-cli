@@ -12,15 +12,23 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
+type Hash [32]byte
+
 type NextNonceRes struct {
 	Nonce uint `json:"nonce"`
 }
 
-type TxsRes struct {
-	Txs []database.SignedTx `json:"transactions"`
+type TX struct {
+	database.SignedTx `json:"tx"`
+	TxHash            string `json:"hash"`
+	BlockHash         string `json:"block_hash"`
 }
 
-func GetTxs(key *keystore.Key, txType string) ([]database.SignedTx, error) {
+type TxsRes struct {
+	Txs []TX `json:"transactions"`
+}
+
+func GetTxs(key *keystore.Key, txType string) ([]TX, error) {
 
 	rawBody, err := makeRequest("http://localhost:8110/address/transactions", "POST", map[string]interface{}{
 		"account": key.Address.Hex(),
